@@ -19,6 +19,7 @@ class Street(models.Model):
     city = models.ForeignKey(City, related_name='streets', on_delete=models.CASCADE)
 
     class Meta:
+        ordering = ('id',)
         verbose_name = 'Street'
         verbose_name_plural = 'Streets'
 
