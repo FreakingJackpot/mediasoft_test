@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from django.db.models import Q, F
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny
@@ -48,30 +46,24 @@ class ShopSet(ViewSet):
             street_name = self.request.query_params.get('street')
             city_name = self.request.query_params.get('city')
             open = self.request.query_params.get('open')
-            time = datetime.now().time()
-            q = Q()
 
+            q = Q()
             if street_name is not None:
                 q.add(Q(street__name=street_name), Q.AND)
 
             if city_name is not None:
                 q.add(Q(city__name=city_name), Q.AND)
 
-            if open is not None:
-                if open == "1":
-                    q.add(Q(
-                        Q(open__lt=F('close')), Q(open__lte=time), Q(close__gt=time)) |
-                          Q(Q(open__gt=F('close')), Q(Q(open__lte=time) | Q(close__gt=time))) | Q(open=F('close')),
-                          Q.AND)
-                elif open == "0":
-                    q.add(Q(
-                        Q(open__lt=F('close')), Q(Q(open__gt=time) | Q(close__lte=time))) |
-                          Q(Q(open__gt=F('close')), Q(open__gt=time), Q(close__lte=time)), Q.AND)
-                else:
-                    raise ValueError
-
             queryset = Shop.objects.filter(q)
             serialized = ShopSerializer(queryset, many=True)
+
+            if open is not None:
+                if (open == '1' or open == '0'):
+                    open = int(open)
+                    data = [item for item in serialized.data if item['opened'] == open]
+                    return Response(data)
+                else:
+                    raise ValueError
 
             return Response(serialized.data)
         except:

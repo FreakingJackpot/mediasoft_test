@@ -2,7 +2,8 @@
 * Сергеев Сергей
 * Тестовое задание на Python
 * Реализация сервиса с REST-api архитектурой на DjangoRestFramework
-* Для запуска нужно: 
+* Для запуска нужно:
+    * Установить библитеки из requirements.txt 
     * подключить свою базу данных
     * создать миграции - python3 manage.py makemigrations
     * применить миграции - python3 manage.py migrate
